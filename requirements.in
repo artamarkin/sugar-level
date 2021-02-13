@@ -1,0 +1,11 @@
+pandas
+plotly
+numpy
+scipy
+fsspec
+tabulate
+jupyter
+nb_black
+jupyterlab
+
+
