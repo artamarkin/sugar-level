@@ -7,5 +7,5 @@ tabulate
 jupyter
 nb_black
 jupyterlab
-
-
+gin-config
+black

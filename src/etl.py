@@ -2,10 +2,14 @@ import logging
 import pathlib
 from dataclasses import InitVar, dataclass, field
 from functools import wraps
-from typing import Callable
+from typing import Callable, Dict, List
+import gin
 
 import numpy as np
 import pandas as pd
+
+local_path = pathlib.Path().resolve()
+GIN_PATH = local_path / "src" / "config.gin"
 
 
 def _decorate_df(func: Callable):
@@ -31,6 +35,33 @@ def _norm_text(text: str) -> str:
     return text.lower().replace("  ", " ")
 
 
+def _search_by_category(
+    text: str,
+    products: str,
+    product_groups: Dict[str, List[str]],
+) -> int:
+    for p in product_groups[products]:
+        if p in text:
+            return 1
+    return 0
+
+
+@gin.configurable
+def _assign_high_level_product_group(
+    df: pd.DataFrame, product_groups: Dict[str, List[str]] = gin.REQUIRED
+) -> pd.DataFrame:
+    """
+    Instead of using original product notes we group all products into
+    high level categories (see config.gin).
+    TODO: use quantity of products as well.
+    """
+    for k in product_groups.keys():
+        df[k] = df["notes_norm"].apply(
+            lambda d: _search_by_category(d, k, product_groups)
+        )
+    return df
+
+
 @dataclass
 class SugarData:
     """
@@ -44,6 +75,7 @@ class SugarData:
     notes: pd.DataFrame = field(init=False)
 
     def __post_init__(self, data_path: pathlib.Path):
+        gin.parse_config_file(GIN_PATH)
         self.raw = self.__read_data(data_path)
         self.cleaned = self.__clean_data()
         self.glucose = self.__glucose()
@@ -90,6 +122,8 @@ class SugarData:
 
     @_decorate_df
     def __notes(self) -> pd.DataFrame:
-        return self.cleaned.loc[
-            lambda d: d["notes"].notnull(), ["datetime", "notes"]
-        ].assign(notes_norm=lambda d: d["notes"].apply(_norm_text))
+        return (
+            self.cleaned.loc[lambda d: d["notes"].notnull(), ["datetime", "notes"]]
+            .assign(notes_norm=lambda d: d["notes"].apply(_norm_text))
+            .pipe(_assign_high_level_product_group)
+        )
