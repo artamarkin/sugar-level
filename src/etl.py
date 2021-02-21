@@ -9,6 +9,10 @@ import pandas as pd
 
 
 def _decorate_df(func: Callable):
+    """
+    Function decorator to log processed data shape
+    """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         logger = logging.getLogger()
@@ -21,6 +25,10 @@ def _decorate_df(func: Callable):
         return func_result
 
     return wrapper
+
+
+def _norm_text(text: str) -> str:
+    return text.lower().replace("  ", " ")
 
 
 @dataclass
@@ -82,4 +90,6 @@ class SugarData:
 
     @_decorate_df
     def __notes(self) -> pd.DataFrame:
-        return self.cleaned.loc[lambda d: d["notes"].notnull(), ["datetime", "notes"]]
+        return self.cleaned.loc[
+            lambda d: d["notes"].notnull(), ["datetime", "notes"]
+        ].assign(notes_norm=lambda d: d["notes"].apply(_norm_text))
