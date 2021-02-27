@@ -72,6 +72,7 @@ class SugarData:
     raw: pd.DataFrame = field(init=False)
     cleaned: pd.DataFrame = field(init=False)
     glucose: pd.DataFrame = field(init=False)
+    glucose_resampled: pd.DataFrame = field(init=False)
     notes: pd.DataFrame = field(init=False)
 
     def __post_init__(self, data_path: pathlib.Path):
@@ -80,6 +81,7 @@ class SugarData:
         self.cleaned = self.__clean_data()
         self.glucose = self.__glucose()
         self.notes = self.__notes()
+        self.glucose_resampled = self.__glucose_resampled()
 
     @_decorate_df
     def __read_data(self, data_path: pathlib.Path) -> pd.DataFrame:
@@ -126,4 +128,14 @@ class SugarData:
             self.cleaned.loc[lambda d: d["notes"].notnull(), ["datetime", "notes"]]
             .assign(notes_norm=lambda d: d["notes"].apply(_norm_text))
             .pipe(_assign_high_level_product_group)
+        )
+
+    @_decorate_df
+    def __glucose_resampled(self) -> pd.DataFrame:
+        return (
+            self.glucose.set_index("datetime")
+            .resample("1min")
+            .mean()
+            .interpolate()
+            .reset_index()
         )
