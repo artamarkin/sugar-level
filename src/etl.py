@@ -127,6 +127,12 @@ class SugarData:
         return (
             self.cleaned.loc[lambda d: d["notes"].notnull(), ["datetime", "notes"]]
             .assign(notes_norm=lambda d: d["notes"].apply(_norm_text))
+            # fix naming. TODO: make dictionary with new names
+            .assign(
+                notes=lambda d: d["notes"]
+                .replace("orange polenta cake", "polenta cake")
+                .replace("orange wine", "wine")
+            )
             .pipe(_assign_high_level_product_group)
         )
 

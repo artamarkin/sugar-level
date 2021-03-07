@@ -13,7 +13,7 @@ _assign_high_level_product_group.product_groups = {
         "plum",
         "melon",
     ],
-    "hot drinks": [
+    "hot_drinks": [
         "coffee",
         "sencha",
         "gyokuro",
@@ -78,6 +78,8 @@ _assign_high_level_product_group.product_groups = {
         "burger",
         "tiramisu",
         "pizza",
+        "cheesecake",
+        "polenta cake",
     ],
     "alcohol": ["wine", "porto"],
 }
