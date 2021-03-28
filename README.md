@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ```
 
 # Experiment Result
-Experiment results can be found in `sugar-level-analysis.pdf`. The notebook with aggregation and computations is `[1]-EDA.ipynb`
+Experiment results can be found in `Sugar-Level-Results.pdf`. The notebook with aggregation and computations is `[1]-EDA.ipynb`
 
 # Future Steps
 Amount of data I collected was quite limited to make any final conclusions. In the future I would like to use the sensors again to extract additional 1-2 months of data to get more concrete results.
