@@ -1,4 +1,0 @@
-ActiveRecord::Base.transaction do
-  LabelVersion.current.update!(current: false)
-  LabelVersion.find_by(version: 4).update!(current: true)
-end
