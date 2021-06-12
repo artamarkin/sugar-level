@@ -89,6 +89,13 @@ class SugarData:
 
     @_decorate_df
     def __clean_data(self) -> pd.DataFrame:
+        
+        # update if measurements are different.
+        # TODO: make a separate function for that 
+        if "Historic Glucose mg/dL"  in self.raw.columns:
+            self.raw["Historic Glucose mmol/L"] = self.raw["Historic Glucose mg/dL"]*0.0555
+            self.raw["Scan Glucose mmol/L"] = self.raw["Scan Glucose mg/dL"]*0.0555
+        
         data = (
             self.raw.rename(columns={"Notes": "notes"})
             .assign(
